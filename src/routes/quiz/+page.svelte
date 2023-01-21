@@ -12,56 +12,61 @@
 		}
 	];
 
-	let message: string = 'Please choose between true or false';
-	let currentLevel: number = 0;
-	let score = {
-		correct: 0,
-		incorrect: 0
+	let gameState = {
+		score: {
+			correct: 0,
+			incorrect: 0
+		},
+		gameFinished: false,
+		message: 'Please choose between true or false',
+		currentLevel: 0
 	};
-	let gameFinished: boolean = false;
 
-	const submitAnswer = (submittedAnswer: boolean, level: number) => {
-		if (submittedAnswer === questions[level].answer) {
-			message = 'You got the answer correct.';
-			score.correct++;
+	const submitAnswer = (submittedAnswer: boolean) => {
+		if (submittedAnswer === questions[gameState.currentLevel].answer) {
+			gameState.message = 'You got the answer correct.';
+			gameState.score.correct++;
 		} else {
-			message = 'You got the answer wrong. Explanation: ' + questions[level].explanation;
-			score.incorrect++;
+			gameState.message =
+				'You got the answer wrong. Explanation: ' + questions[gameState.currentLevel].explanation;
+			gameState.score.incorrect++;
 		}
 
-		if (level == questions.length - 1) {
-			message = `You finished the quiz! Total correct answers: ${score.correct}, Total incorrect answers: ${score.incorrect}`;
-			score.correct = 0;
-			score.incorrect = 0;
-			gameFinished = true;
+		if (gameState.currentLevel == questions.length - 1) {
+			gameState.message = `You finished the quiz! 
+                    Total correct answers: ${gameState.score.correct}, 
+                    Total incorrect answers: ${gameState.score.incorrect}`;
+			gameState.score.correct = 0;
+			gameState.score.incorrect = 0;
+			gameState.gameFinished = true;
 		} else {
-			currentLevel++;
+			gameState.currentLevel++;
 		}
 	};
 
 	const resetQuiz = () => {
-		currentLevel = 0;
-		message = 'Please choose between true or false';
-		gameFinished = false;
+		gameState.currentLevel = 0;
+		gameState.message = 'Please choose between true or false';
+		gameState.gameFinished = false;
 	};
 </script>
 
 <svelte:head>
-	<title>About</title>
-	<meta name="description" content="About this app" />
+	<title>Svelte Quiz</title>
+	<meta name="description" content="Quiz" />
 </svelte:head>
 
 <main>
 	<h1>JavaScript Quiz with Svelte!</h1>
-	{#if !gameFinished}
-		<div class="question">{questions[currentLevel].question}</div>
+	{#if !gameState.gameFinished}
+		<div class="question">{questions[gameState.currentLevel].question}</div>
 		<div class="buttons">
-			<button on:click={() => submitAnswer(true, currentLevel)}>True</button>
-			<button on:click={() => submitAnswer(false, currentLevel)}>False</button>
+			<button on:click={() => submitAnswer(true)}>True</button>
+			<button on:click={() => submitAnswer(false)}>False</button>
 		</div>
 	{/if}
-	<div class="answer">{message}</div>
-	{#if gameFinished}
+	<div class="answer">{gameState.message}</div>
+	{#if gameState.gameFinished}
 		<div class="reset">
 			<button on:click={() => resetQuiz()}>Reset Quiz</button>
 		</div>
