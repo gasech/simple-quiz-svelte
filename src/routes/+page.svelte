@@ -1,4 +1,12 @@
 <script lang="ts">
+	import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
+
+	const progress = tweened(0, {
+		duration: 400,
+		easing: cubicOut
+	});
+
 	// Add your questions here.
 	const questions = [
 		{
@@ -40,8 +48,12 @@
 			gameState.score.correct = 0;
 			gameState.score.incorrect = 0;
 			gameState.gameFinished = true;
+			progress.set(1);
 		} else {
 			gameState.currentLevel++;
+
+			let progressValue = gameState.currentLevel / questions.length;
+			progress.set(progressValue);
 		}
 	};
 
@@ -49,6 +61,7 @@
 		gameState.currentLevel = 0;
 		gameState.message = 'Please choose between true or false';
 		gameState.gameFinished = false;
+		progress.set(0);
 	};
 </script>
 
@@ -59,6 +72,7 @@
 
 <main>
 	<h1>JavaScript Quiz with Svelte!</h1>
+	<progress value={$progress} />
 	{#if !gameState.gameFinished}
 		<div class="question">{questions[gameState.currentLevel].question}</div>
 		<div class="buttons">
@@ -90,6 +104,12 @@
 		gap: 10px;
 		align-items: center;
 		justify-content: center;
+	}
+
+	progress {
+		display: block;
+		width: 100%;
+		padding: 20px 0px;
 	}
 
 	button {
